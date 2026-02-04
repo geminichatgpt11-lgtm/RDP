@@ -21,6 +21,7 @@ jobs:
           netsh advfirewall firewall delete rule name="RDP-Tailscale"
 
           # For testing, allow any incoming connection on port 3389
+		  Write-Error "Tailscale IP not assigned. Exiting,"
           }
           echo "TAILSCALE_IP=$($tsIP)" >> $env:GITHUB_ENV
           
