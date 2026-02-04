@@ -11,32 +11,29 @@ jobs:
         run: |
           # Enable Remote Desktop and disable Network Level Authentication (if needed)
           Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" `
-            -Name "fDenyTSConnections" -Value 0 -Force
-
+                             -Name "fDenyTSConnections" -Value 0 -Force
           Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" `
-            -Name "UserAuthentication" -Value 0 -Force
-
+                             -Name "UserAuthentication" -Value 0 -Force
           Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" `
-            -Name "SecurityLayer" -Value 0 -Force
+                             -Name "SecurityLayer" -Value 0 -Force
 
           # Remove any existing rule with the same name to avoid duplication
           netsh advfirewall firewall delete rule name="RDP-Tailscale"
 
           # For testing, allow any incoming connection on port 3389
+          }
           echo "TAILSCALE_IP=$($tsIP)" >> $env:GITHUB_ENV
-
+          
       - name: Verify RDP Accessibility
         run: |
           Write-Host "Tailscale IP: $env:TAILSCALE_IP"
 
           # Test connectivity using Test-NetConnection against the Tailscale IP on port 3389
           $testResult = Test-NetConnection -ComputerName $env:TAILSCALE_IP -Port 3389
-
           if (-not $testResult.TcpTestSucceeded) {
-            Write-Error "TCP connection to RDP port 3389 failed"
-            exit 1
+              Write-Error "TCP connection to RDP port 3389 failed"
+              exit 1
           }
-
           Write-Host "TCP connectivity successful!"
 
       - name: Maintain Connection
